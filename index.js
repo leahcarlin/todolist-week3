@@ -3,7 +3,10 @@ const TodoList = require("./models").todoList;
 const express = require("express");
 
 const app = express();
-const PORT = 4000;
+const cors = require("cors");
+app.use(cors());
+
+const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
 
@@ -41,20 +44,20 @@ app.get("/users/:id", async (req, res, next) => {
 });
 
 // //updating a user
-// app.put("users/:userId", async (req, res, next) => {
-//   try {
-//     const userId = parseInt(req.params.userId);
-//     const userToUpdate = await User.findByPk(userId);
-//     if (!userToUpdate) {
-//       res.status(404).send("User not found");
-//     } else {
-//       const updatedUser = await userToUpdate.update(req.body);
-//       res.json(updatedUser);
-//     }
-//   } catch (e) {
-//     next(e);
-//   }
-// });
+app.put("users/:id", async (req, res, next) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const userToUpdate = await User.findByPk(userId);
+    if (!userToUpdate) {
+      res.status(404).send("User not found");
+    } else {
+      const updatedUser = await userToUpdate.update(req.body);
+      res.json(updatedUser);
+    }
+  } catch (e) {
+    next(e);
+  }
+});
 
 // get all todo lists for one user
 app.get("/users/:id/lists", async (req, res, next) => {
@@ -73,7 +76,7 @@ app.get("/users/:id/lists", async (req, res, next) => {
   }
 });
 
-// get all todo lists
+// Get all todo lists
 app.get("/todoLists", async (req, res, next) => {
   try {
     const todoLists = await TodoList.findAll();
