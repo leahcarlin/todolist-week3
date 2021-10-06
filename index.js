@@ -44,15 +44,33 @@ app.get("/users/:id", async (req, res, next) => {
 });
 
 // //updating a user
-app.put("users/:id", async (req, res, next) => {
+app.put("/users/:id", async (req, res, next) => {
   try {
     const userId = parseInt(req.params.id);
+    console.log(userId);
     const userToUpdate = await User.findByPk(userId);
     if (!userToUpdate) {
       res.status(404).send("User not found");
     } else {
       const updatedUser = await userToUpdate.update(req.body);
-      res.json(updatedUser);
+      res.send(updatedUser);
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+// terminal command: http PUT :4000/user/2 name=Karla
+
+// Delete a user
+app.delete("/users/:id", async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const userToDelete = await User.findByPk(userId);
+    if (!userToDelete) {
+      res.status(404).send("User not found");
+    } else {
+      await userToDelete.destroy();
+      res.send(userToDelete);
     }
   } catch (e) {
     next(e);
@@ -67,7 +85,7 @@ app.get("/users/:id/lists", async (req, res, next) => {
       include: [TodoList],
     });
     if (user) {
-      res.send(user.TodoList);
+      res.send(user.todoLists);
     } else {
       res.status(404).send("User not found");
     }
@@ -75,6 +93,19 @@ app.get("/users/:id/lists", async (req, res, next) => {
     next(e);
   }
 });
+
+// Delete a user's list
+// app.get("/users/:id/lists/:listId", async (req, res, next) => {
+//   try {
+//     const userId = parseInt(req.params.id);
+//     const listId = parseInt(req.pararms.listId);
+//     const user = await User.findByPk(userId, {
+//       include: [TodoList],
+//     });
+//   } catch (e) {
+//     next(e);
+//   }
+// });
 
 // Get all todo lists
 app.get("/todoLists", async (req, res, next) => {
@@ -91,6 +122,22 @@ app.post("/todoLists", async (req, res, next) => {
   try {
     const newList = await TodoList.create(req.body);
     res.json(newList);
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Update an existing list
+app.put("/todoLists/:id", async (req, res, next) => {
+  try {
+    const listId = req.params.id;
+    const listToUpdate = await TodoList.findByPk(listId);
+    if (!listToUpdate) {
+      res.status(404).send("List not found");
+    } else {
+      await listToUpdate.update(req.body);
+      res.send(listToUpdate);
+    }
   } catch (e) {
     next(e);
   }
